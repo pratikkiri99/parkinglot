@@ -3,11 +3,13 @@ package com.parking.util;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.parking.constants.Constants.VEHICLE_TYPE;
@@ -20,6 +22,8 @@ import com.parking.entities.Ticket;
 
 @Component
 public class ParkingUtility {
+	
+	private static final Logger logger = LoggerFactory.getLogger(ParkingUtility.class);
 	
 	/**
 	 * Returns list of available free parking spots for given vehicle type
@@ -93,27 +97,33 @@ public class ParkingUtility {
 	 * @return
 	 */
 	public ParkingSlot getFreeParkingSlotForVehicle(ParkingLot parkingLot, VEHICLE_TYPE vehicleType) {
-		List<Level> levelList = parkingLot.getAllLevels();
+		
 		ParkingSlot availableSlot = null;
 		
-		for (Iterator<Level> iterator = levelList.iterator(); iterator.hasNext();) {
-			Level level = (Level) iterator.next();
-			
-			if(VEHICLE_TYPE.BIKE == vehicleType) {
+		if(parkingLot != null) {
+			List<Level> levelList = parkingLot.getAllLevels();
+			for (Iterator<Level> iterator = levelList.iterator(); iterator.hasNext();) {
+				Level level = (Level) iterator.next();
 				
-				List<BikeParkingSlot> bikeSlots = level.getBikeParkingSlots();
-			    availableSlot = bikeSlots.stream().filter(bikeSlot->bikeSlot.isSlotAvailable()).
-			    		                              findFirst().get();
-			} else {
-				List<CarParkingSlot> carSlots = level.getCarParkingLots();
-				availableSlot = carSlots.stream().filter(carSlot->carSlot.isSlotAvailable()).
-                        findFirst().get();
-						
-			} 
-			
-			if(availableSlot!=null)
-				return availableSlot;
+				if(VEHICLE_TYPE.BIKE == vehicleType) {
+					
+					List<BikeParkingSlot> bikeSlots = level.getBikeParkingSlots();
+				    availableSlot = bikeSlots.stream().filter(bikeSlot->bikeSlot.isSlotAvailable()).
+				    		                              findFirst().get();
+				} else {
+					List<CarParkingSlot> carSlots = level.getCarParkingLots();
+					availableSlot = carSlots.stream().filter(carSlot->carSlot.isSlotAvailable()).
+	                        findFirst().get();
+							
+				} 
+				
+				if(availableSlot!=null)
+					return availableSlot;
+			}
+		} else {
+			logger.warn("Parkin log object is null");
 		}
+
 		return availableSlot;
 	}
 	
@@ -127,6 +137,7 @@ public class ParkingUtility {
 		
 		List<String> registrationNums = new ArrayList<String>();
 		
+		if(matchPattern != null && ticketSet != null)
 		for (Iterator <Entry<String, Ticket>> iterator = ticketSet.iterator(); iterator.hasNext();) {
 			Entry<String, Ticket> entry = iterator.next();
 			String key = entry.getKey();
@@ -167,4 +178,5 @@ public class ParkingUtility {
 		}
 	}
 	
+
 }

@@ -10,7 +10,9 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.parking.constants.Constants.VEHICLE_TYPE;
@@ -38,7 +40,9 @@ public class ParkingController {
 		return parkingService.getAllAvailableSlots();
 	}
 	
-	@GetMapping("/parkVehicle/{vehicleType}")
+	//@GetMapping("/parkVehicle/{vehicleType}")
+	@RequestMapping(value = "/parkVehicle/{vehicleType}", method = RequestMethod.GET)
+	@ResponseBody
 	public Ticket parkVehicle(@PathVariable String vehicleType,
 							@RequestParam ("registrationNumber")String registrationNumber) {
 		logger.info("vehicleType->"+vehicleType+",registrationNumber->"+registrationNumber);
